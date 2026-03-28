@@ -1,0 +1,38 @@
+{
+  "name": "html2apk",
+  "displayName": "html2apk",
+  "version": "1.0.0",
+  "description": "html2apk",
+  "main": "index.html",
+  "scripts": {
+    "build": "echo 'No build step required' && exit 0",
+
+    "cap:init": "npx cap init 'html2apk' html2apk.josevdr95.html2apk --web-dir www",
+    "cap:add": "npx cap add android",
+    "cap:sync": "npx cap sync",
+    "cap:open": "npx cap open android",
+    "cap:run": "npx cap run android",
+    "cap:build": "npx cap sync android",
+    "android:build": "cd android && ./gradlew assembleDebug",
+    "android:release": "cd android && ./gradlew assembleRelease"
+  },
+  "keywords": [
+    "capacitor",
+    "android",
+    "crypto",
+    "cuba"
+  ],
+  "author": "html2apk",
+  "license": "MIT",
+  "dependencies": {
+    "@capawesome/capacitor-android-edge-to-edge-support": "^8.0.0",
+    "@capacitor/android": "^8.0.0",
+    "@capacitor/core": "^8.0.0",
+    "@capacitor/share": "^7.0.0",
+    "@capacitor/status-bar": "^7.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^8.0.0"
+  }
+}

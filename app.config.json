@@ -1,0 +1,42 @@
+{
+  "appId": "html2apk.josevdr95.basehtml2apk",
+  "appName": "html2apk",
+  "version": "1.0.0",
+  "versionCode": 1,
+  "description": "html2apk",
+  "author": {
+    "name": "html2apk",
+    "email": "correo@gmail.com",
+    "url": "https://ejemplo.com"
+  },
+  "android": {
+    "minSdkVersion": 26,
+    "targetSdkVersion": 35,
+    "compileSdkVersion": 35,
+    "permissions": [
+      "android.permission.INTERNET",
+      "android.permission.ACCESS_NETWORK_STATE"
+    ],
+    "displayCutout": "shortEdges",
+    "iconBackgroundColor": "#000000",
+    "splashBackgroundColor": "#000000",
+    "hardwareAccelerated": true,
+    "largeHeap": true,
+    "allowBackup": false
+  },
+  "deepLinks": {
+    "enabled": false,
+    "scheme": "miapp",
+    "host": "miapp.com",
+    "paths": [
+      "/producto/:id",
+      "/usuario/:username",
+      "/configuracion",
+      "/promo/:codigo"
+    ]
+  },
+  "build": {
+    "compile": true,
+    "emulator": false
+  }
+}

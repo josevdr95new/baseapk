@@ -1,0 +1,23 @@
+{
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "allowMixedContent": true,
+    "webContentsDebuggingEnabled": true
+  },
+  "plugins": {
+    "SystemBars": {
+      "insetsHandling": "disable"
+    },
+    "Keyboard": {
+      "resizeOnFullScreen": false
+    },
+    "EdgeToEdge": {
+      "backgroundColor": "#0a0e17",
+      "navigationBarColor": "#0a0e17",
+      "statusBarColor": "#0a0e17"
+    }
+  }
+}

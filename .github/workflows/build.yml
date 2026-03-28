@@ -1,0 +1,532 @@
+name: Build Android App
+
+on:
+  push:
+    branches: ["main", "master"]
+  workflow_dispatch:
+    inputs:
+      compile:
+        description: 'Compilar APK'
+        required: false
+        default: 'auto'
+        type: choice
+        options:
+          - auto
+          - 'true'
+          - 'false'
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  check-commit:
+    runs-on: ubuntu-latest
+    outputs:
+      compile: ${{ steps.check.outputs.compile }}
+      emulator: ${{ steps.check.outputs.emulator }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check commit message and config
+        id: check
+        run: |
+          MESSAGE="${{ github.event.head_commit.message }}"
+          CONFIG_EMULATOR=$(cat app.config.json | jq -r '.build.emulator // false')
+          
+          if [[ "$MESSAGE" == *"[compile]"* ]] || [[ "$MESSAGE" == *"[compilar]"* ]] || [[ "$MESSAGE" == *"[build]"* ]]; then
+            echo "compile=true" >> $GITHUB_OUTPUT
+          elif [[ "$MESSAGE" == *"[skip]"* ]] || [[ "$MESSAGE" == *"[noc]"* ]]; then
+            echo "compile=false" >> $GITHUB_OUTPUT
+          else
+            if [ "${{ github.event.inputs.compile }}" = "true" ]; then
+              echo "compile=true" >> $GITHUB_OUTPUT
+            else
+              echo "compile=false" >> $GITHUB_OUTPUT
+            fi
+          fi
+          echo "emulator=$CONFIG_EMULATOR" >> $GITHUB_OUTPUT
+
+  build-android:
+    needs: check-commit
+    if: needs.check-commit.outputs.compile == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Read app.config.json
+        id: config
+        run: |
+          CONFIG=$(cat app.config.json)
+          echo "appId=$(echo $CONFIG | jq -r '.appId')" >> $GITHUB_OUTPUT
+          echo "appName=$(echo $CONFIG | jq -r '.appName')" >> $GITHUB_OUTPUT
+          echo "version=$(echo $CONFIG | jq -r '.version')" >> $GITHUB_OUTPUT
+          echo "versionCode=$(echo $CONFIG | jq -r '.versionCode')" >> $GITHUB_OUTPUT
+          echo "minSdk=$(echo $CONFIG | jq -r '.android.minSdkVersion')" >> $GITHUB_OUTPUT
+          echo "targetSdk=$(echo $CONFIG | jq -r '.android.targetSdkVersion')" >> $GITHUB_OUTPUT
+          echo "runEmulator=$(echo $CONFIG | jq -r '.build.emulator // false')" >> $GITHUB_OUTPUT
+          echo "fullscreen=$(echo $CONFIG | jq -r '.android.fullscreen // false')" >> $GITHUB_OUTPUT
+          echo "displayCutout=$(echo $CONFIG | jq -r '.android.displayCutout // "never"')" >> $GITHUB_OUTPUT
+          echo "statusBarColor=$(echo $CONFIG | jq -r '.android.statusBarColor')" >> $GITHUB_OUTPUT
+          echo "navigationBarColor=$(echo $CONFIG | jq -r '.android.navigationBarColor')" >> $GITHUB_OUTPUT
+          echo "splashBackgroundColor=$(echo $CONFIG | jq -r '.android.splashBackgroundColor')" >> $GITHUB_OUTPUT
+          echo "iconBackgroundColor=$(echo $CONFIG | jq -r '.android.iconBackgroundColor')" >> $GITHUB_OUTPUT
+          echo "hardwareAccelerated=$(echo $CONFIG | jq -r '.android.hardwareAccelerated // true')" >> $GITHUB_OUTPUT
+          echo "largeHeap=$(echo $CONFIG | jq -r '.android.largeHeap // false')" >> $GITHUB_OUTPUT
+          echo "allowBackup=$(echo $CONFIG | jq -r '.android.allowBackup // true')" >> $GITHUB_OUTPUT
+
+      - name: Update capacitor.config.json
+        run: |
+          APP_ID="${{ steps.config.outputs.appId }}"
+          APP_NAME="${{ steps.config.outputs.appName }}"
+          
+          jq --arg appId "$APP_ID" --arg appName "$APP_NAME" \
+             '.appId = $appId | .appName = $appName' \
+             capacitor.config.json > capacitor.config.tmp && mv capacitor.config.tmp capacitor.config.json
+          
+          echo ">>> capacitor.config.json actualizado"
+
+      - name: Setup Java JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Setup Android SDK
+        run: |
+          echo "Installing Android SDK..."
+          
+          export ANDROID_HOME=$HOME/android-sdk
+          export ANDROID_SDK_ROOT=$ANDROID_HOME
+          mkdir -p $ANDROID_HOME/cmdline-tools
+          
+          cd /tmp
+          wget -q "https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip" -O cmdline-tools.zip
+          unzip -q -o cmdline-tools.zip -d $ANDROID_HOME/cmdline-tools/
+          mv $ANDROID_HOME/cmdline-tools/cmdline-tools $ANDROID_HOME/cmdline-tools/latest 2>/dev/null || true
+          rm -f cmdline-tools.zip
+          
+          export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools
+          yes | sdkmanager --licenses > /dev/null 2>&1 || true
+          sdkmanager --install "platform-tools" "platforms;android-34" "build-tools;34.0.0"
+          
+          echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
+          echo "ANDROID_SDK_ROOT=$ANDROID_HOME" >> $GITHUB_ENV
+          echo "PATH=$PATH" >> $GITHUB_ENV
+          ls -la $ANDROID_HOME
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build Web App
+        run: npm run build
+
+      - name: Add Android Platform
+        run: npx cap add android
+
+      - name: Generate Icons and Splash Screens
+        run: |
+          echo "=== Verificando assets ==="
+          ls -la assets/ 2>/dev/null || echo "No hay carpeta assets"
+          
+          if [ -f "assets/icon.png" ]; then
+            echo "Icon encontrado: $(file assets/icon.png)"
+          fi
+          
+          if [ -f "assets/splash.png" ]; then
+            echo "Splash encontrado: $(file assets/splash.png)"
+          fi
+          
+          echo "=== Generando iconos y splash ==="
+          if [ -f "assets/icon.png" ] || [ -f "assets/splash.png" ]; then
+            npx @capacitor/assets generate --android \
+              --iconBackgroundColor '${{ steps.config.outputs.iconBackgroundColor }}' \
+              --iconBackgroundColorDark '${{ steps.config.outputs.iconBackgroundColor }}' \
+              --splashBackgroundColor '${{ steps.config.outputs.splashBackgroundColor }}' \
+              --splashBackgroundColorDark '${{ steps.config.outputs.splashBackgroundColor }}' || echo "Error generando assets, continuando..."
+            
+            echo "=== Verificando assets generados ==="
+            ls -la android/app/src/main/res/mipmap-*/ 2>/dev/null || echo "No se encontraron mipmap"
+            ls -la android/app/src/main/res/drawable*/ 2>/dev/null || echo "No se encontraron drawable"
+          else
+            echo "No se encontraron assets para generar"
+          fi
+
+      - name: Sync Capacitor
+        run: |
+          echo "=== Running cap sync ==="
+          npx cap sync android
+          echo ""
+          echo "=== Verificando Android plugins ==="
+          cat android/app/src/main/assets/capacitor.config.json 2>/dev/null || echo "No capacitor.config.json in assets"
+          cat android/capacitor.settings.gradle 2>/dev/null || echo "No capacitor.settings.gradle"
+
+      - name: Apply Custom Styles
+        run: |
+          echo "=== Copiando styles.xml pre-configurado ==="
+          
+          if [ -f "android-config/styles.xml" ]; then
+            cp android-config/styles.xml android/app/src/main/res/values/styles.xml
+            echo ">>> styles.xml copiado"
+          else
+            echo "❌ android-config/styles.xml no encontrado"
+          fi
+          
+          if [ -f "android-config/colors.xml" ]; then
+            cp android-config/colors.xml android/app/src/main/res/values/colors.xml
+            echo ">>> colors.xml copiado"
+          else
+            echo "❌ android-config/colors.xml no encontrado"
+          fi
+
+      - name: Update Android Configuration
+        run: |
+          echo "=== Configurando Android SDK ==="
+          VERSION_CODE="${{ steps.config.outputs.versionCode }}"
+          VERSION="${{ steps.config.outputs.version }}"
+          MIN_SDK="${{ steps.config.outputs.minSdk }}"
+          TARGET_SDK="${{ steps.config.outputs.targetSdk }}"
+          
+          echo "versionCode: $VERSION_CODE, version: $VERSION"
+          echo "minSdk: $MIN_SDK, targetSdk: $TARGET_SDK"
+          
+          cd android
+          if [ -f "variables.gradle" ]; then
+            sed -i "s/minSdkVersion *= *[0-9]*/minSdkVersion = $MIN_SDK/g" variables.gradle
+            sed -i "s/targetSdkVersion *= *[0-9]*/targetSdkVersion = $TARGET_SDK/g" variables.gradle
+            sed -i "s/compileSdkVersion *= *[0-9]*/compileSdkVersion = 36/g" variables.gradle
+            if ! grep -q "androidxCoreVersion" variables.gradle; then
+              echo "    androidxCoreVersion = '1.15.0'" >> variables.gradle
+            fi
+            echo "✅ variables.gradle actualizado"
+          fi
+          sed -i "s/classpath 'com.android.tools.build:gradle:[^']*'/classpath 'com.android.tools.build:gradle:8.9.1'/" build.gradle
+          echo "✅ Gradle plugin actualizado"
+          sed -i "s/distributionUrl=.*/distributionUrl=https:\/\/services.gradle.org\/distributions\/gradle-8.11.1-bin.zip/" gradle/wrapper/gradle-wrapper.properties
+          echo "✅ Gradle version actualizado"
+          
+          if ! grep -q "jitpack.io" build.gradle 2>/dev/null; then
+            sed -i '/mavenCentral()/a \        maven { url "https://jitpack.io" }' build.gradle
+            echo "✅ JitPack agregado"
+          fi
+          if grep -q "allprojects" build.gradle && ! grep -q "jitpack.io" build.gradle 2>/dev/null; then
+            sed -i '/allprojects {/,/}/ { /mavenCentral()/a \        maven { url "https://jitpack.io" } }' build.gradle
+            echo "✅ JitPack en allprojects"
+          fi
+          cd app
+          sed -i "s/compileSdk rootProject.ext.compileSdkVersion/compileSdk 36/" build.gradle
+          sed -i "s/compileSdkVersion rootProject.ext.compileSdkVersion/compileSdk 36/" build.gradle
+          sed -i "s/minSdkVersion rootProject.ext.minSdkVersion/minSdkVersion $MIN_SDK/" build.gradle
+          sed -i "s/minSdk rootProject.ext.minSdkVersion/minSdk $MIN_SDK/" build.gradle
+          sed -i "s/versionCode [0-9]*/versionCode $VERSION_CODE/" build.gradle
+          sed -i "s/versionName \"[^\"]*\"/versionName \"$VERSION\"/" build.gradle
+          if ! grep -q "androidx.core:core" build.gradle; then
+            sed -i '/dependencies {/a \    implementation "androidx.core:core:1.15.0"' build.gradle
+          fi
+          cd ../..
+
+      - name: Configure Dependency Resolution
+        run: |
+          cd android
+          if ! grep -q "configurations.all" build.gradle; then
+            cat >> build.gradle << 'EOF'
+
+          subprojects {
+              configurations.all {
+                  resolutionStrategy {
+                      force 'androidx.core:core:1.15.0'
+                      force 'androidx.core:core-ktx:1.15.0'
+                  }
+              }
+          }
+          EOF
+          fi
+          cd ..
+
+      - name: Configure JitPack Repository
+        run: |
+          SETTINGS_GRADLE="android/settings.gradle"
+          
+          if grep -q "dependencyResolutionManagement" "$SETTINGS_GRADLE" 2>/dev/null; then
+            if ! grep -q "jitpack.io" "$SETTINGS_GRADLE" 2>/dev/null; then
+              sed -i '/dependencyResolutionManagement/,/^}/ { /repositories {/a \            maven { url "'"'"'https://jitpack.io'"'"'" } }' "$SETTINGS_GRADLE"
+              echo "JitPack added to dependencyResolutionManagement"
+            fi
+          else
+            if ! grep -q "jitpack.io" "$SETTINGS_GRADLE" 2>/dev/null; then
+              sed -i "/repositories {/a \            maven { url 'https://jitpack.io' }" "$SETTINGS_GRADLE"
+              echo "JitPack added to settings.gradle"
+            fi
+          fi
+          
+          cat "$SETTINGS_GRADLE"
+
+      - name: Configure Notch and Fullscreen
+        run: |
+          MANIFEST="android/app/src/main/AndroidManifest.xml"
+          
+          echo "=== Configurando pantalla completa y notch ==="
+          
+          # Añadir windowLayoutInDisplayCutoutMode si no existe
+          if ! grep -q "windowLayoutInDisplayCutoutMode" "$MANIFEST"; then
+            sed -i 's|</application>|    <meta-data android:name="android.notch_support" android:value="true" />\n</application>|' "$MANIFEST"
+            echo ">>> Notch support añadido"
+          fi
+          
+          # Verificar que tenga android:resizeableActivity
+          if ! grep -q 'android:resizeableActivity' "$MANIFEST"; then
+            sed -i 's|<application|<application android:resizeableActivity="true"|' "$MANIFEST"
+            echo ">>> resizeableActivity añadido"
+          fi
+          
+          cat "$MANIFEST"
+
+      - name: Configure Android Permissions
+        run: |
+          MANIFEST="android/app/src/main/AndroidManifest.xml"
+          
+          # Leer permisos desde app.config.json
+          PERMS=$(jq -r '.android.permissions[]?' app.config.json 2>/dev/null)
+          
+          echo "=== Permisos configurados en app.config.json ==="
+          echo "$PERMS"
+          
+          echo "=== Permisos actuales en AndroidManifest (de plugins) ==="
+          grep "uses-permission" "$MANIFEST" || echo "No hay permisos de plugins"
+          
+          # Añadir permisos de app.config.json SOLO si no existen ya
+          while IFS= read -r perm; do
+            if [ -n "$perm" ]; then
+              if ! grep -q "android:name=\"$perm\"" "$MANIFEST"; then
+                sed -i "/<\/manifest>/i\    <uses-permission android:name=\"$perm\" />" "$MANIFEST"
+                echo ">>> Añadido: $perm"
+              else
+                echo ">>> Ya existe: $perm"
+              fi
+            fi
+          done <<< "$PERMS"
+          
+          echo "=== Permisos finales (plugins + app.config.json) ==="
+          grep "uses-permission" "$MANIFEST" || echo "No hay permisos"
+
+      - name: Configure App Settings
+        run: |
+          MANIFEST="android/app/src/main/AndroidManifest.xml"
+          
+          HW_ACCELERATED='${{ steps.config.outputs.hardwareAccelerated }}'
+          LARGE_HEAP='${{ steps.config.outputs.largeHeap }}'
+          ALLOW_BACKUP='${{ steps.config.outputs.allowBackup }}'
+          
+          echo "=== Configurando android:hardwareAccelerated, android:largeHeap, android:allowBackup ==="
+          echo "hardwareAccelerated: $HW_ACCELERATED"
+          echo "largeHeap: $LARGE_HEAP"
+          echo "allowBackup: $ALLOW_BACKUP"
+          
+          # Aplicar hardwareAccelerated al tag application
+          if grep -q 'android:hardwareAccelerated' "$MANIFEST"; then
+            sed -i "s|android:hardwareAccelerated=\"[^\"]*\"|android:hardwareAccelerated=\"$HW_ACCELERATED\"|g" "$MANIFEST"
+          else
+            sed -i 's|<application|<application android:hardwareAccelerated="'$HW_ACCELERATED'"|' "$MANIFEST"
+          fi
+          
+          # Aplicar largeHeap al tag application
+          if grep -q 'android:largeHeap' "$MANIFEST"; then
+            sed -i "s|android:largeHeap=\"[^\"]*\"|android:largeHeap=\"$LARGE_HEAP\"|g" "$MANIFEST"
+          else
+            sed -i 's|<application|<application android:largeHeap="'$LARGE_HEAP'"|' "$MANIFEST"
+          fi
+          
+          # Aplicar allowBackup al tag application
+          if grep -q 'android:allowBackup' "$MANIFEST"; then
+            sed -i "s|android:allowBackup=\"[^\"]*\"|android:allowBackup=\"$ALLOW_BACKUP\"|g" "$MANIFEST"
+          else
+            sed -i 's|<application|<application android:allowBackup="'$ALLOW_BACKUP'"|' "$MANIFEST"
+          fi
+          
+          echo "=== Configuración aplicada ==="
+          grep -E 'android:(hardwareAccelerated|largeHeap|allowBackup)' "$MANIFEST" || echo "No se encontraron atributos"
+
+      - name: Configure Display Cutout
+        run: |
+          echo "=== Configurando displayCutout y fullscreen ==="
+          
+          FULLSCREEN='${{ steps.config.outputs.fullscreen }}'
+          CUTOUT='${{ steps.config.outputs.displayCutout }}'
+          
+          echo "fullscreen: $FULLSCREEN"
+          echo "displayCutout: $CUTOUT"
+          
+          # Aplicar al AndroidManifest
+          MANIFEST="android/app/src/main/AndroidManifest.xml"
+          
+          if [ "$FULLSCREEN" = "true" ]; then
+            echo ">>> Fullscreen habilitado"
+          else
+            # Quitar fullscreen del manifest si existe
+            sed -i 's/android:windowFullscreen="true"/android:windowFullscreen="false"/g' "$MANIFEST"
+            echo ">>> Fullscreen deshabilitado"
+          fi
+          
+          # Aplicar displayCutout al styles.xml
+          STYLES_FILE="android/app/src/main/res/values/styles.xml"
+          if [ -f "$STYLES_FILE" ]; then
+            if grep -q "windowLayoutInDisplayCutoutMode" "$STYLES_FILE"; then
+              sed -i "s|windowLayoutInDisplayCutoutMode\">[^<]*|windowLayoutInDisplayCutoutMode\">$CUTOUT|g" "$STYLES_FILE"
+            else
+              sed -i "/android:windowTranslucentStatus/a\        <item name=\"android:windowLayoutInDisplayCutoutMode\">$CUTOUT</item>" "$STYLES_FILE"
+            fi
+            echo ">>> displayCutout aplicado: $CUTOUT"
+          fi
+
+      - name: Build APK
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+
+      - name: Rename APK
+        run: |
+          APK_NAME="${{ steps.config.outputs.appName }}-v${{ steps.config.outputs.version }}"
+          APK_NAME=$(echo "$APK_NAME" | tr ' ' '-')
+          cd android/app/build/outputs/apk/debug
+          mv app-debug.apk "${APK_NAME}.apk"
+          echo "APK_PATH=$(pwd)/${APK_NAME}.apk" >> $GITHUB_ENV
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: App-Instalable
+          path: android/app/build/outputs/apk/debug/*.apk
+          retention-days: 30
+          if-no-files-found: error
+
+      - name: Enable KVM group perms
+        if: steps.config.outputs.runEmulator == 'true'
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Run Emulator and Test APK
+        if: steps.config.outputs.runEmulator == 'true'
+        run: |
+          echo "Starting Android Emulator..."
+          
+          mkdir -p screenshots
+          
+          API_LEVEL="${{ steps.config.outputs.targetSdk }}"
+          if [ -z "$API_LEVEL" ] || [ "$API_LEVEL" = "null" ]; then
+            API_LEVEL=34
+          fi
+          
+          # Find Android SDK location
+          echo "=== Buscando Android SDK ==="
+          echo "ANDROID_HOME env: $ANDROID_HOME"
+          echo "ANDROID_SDK_ROOT env: $ANDROID_SDK_ROOT"
+          echo "HOME: $HOME"
+          
+          # Buscar en posibles ubicaciones
+          for dir in "$HOME/android-sdk" "$ANDROID_HOME" "$ANDROID_SDK_ROOT" "/opt/android-sdk" "$HOME/Library/Android/sdk" "/usr/local/android-sdk"; do
+            if [ -d "$dir" ]; then
+              echo ">>> SDK encontrado en: $dir"
+              export ANDROID_HOME="$dir"
+              break
+            fi
+          done
+          
+          if [ -z "$ANDROID_HOME" ] || [ ! -d "$ANDROID_HOME" ]; then
+            # Crear directorio si no existe
+            export ANDROID_HOME="$HOME/android-sdk"
+            mkdir -p "$ANDROID_HOME"
+            echo ">>> Creando SDK en: $ANDROID_HOME"
+          fi
+          
+          echo "=== ANDROID_HOME final: $ANDROID_HOME ==="
+          echo "=== Contenido del SDK ==="
+          ls -la "$ANDROID_HOME/" 2>/dev/null || echo "No hay contenido"
+          
+          export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin
+          
+          echo "=== Verificando comandos ==="
+          which sdkmanager || echo "sdkmanager no encontrado en PATH"
+          which avdmanager || echo "avdmanager no encontrado en PATH"
+          which emulator || echo "emulator no encontrado en PATH"
+          
+          # Buscar sdkmanager en rutas comunes
+          find "$ANDROID_HOME" -name "sdkmanager" 2>/dev/null | head -3
+          find "$ANDROID_HOME" -name "emulator" 2>/dev/null | head -3
+          
+          echo "Installing emulator..."
+          yes | sdkmanager "emulator" "platform-tools" "platforms;android-$API_LEVEL" "system-images;android-$API_LEVEL;google_apis;x86_64" 2>/dev/null || echo "sdkmanager falló, intentando con ruta directa..."
+          
+          # Intentar con ruta directa
+          if [ -f "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" ]; then
+            yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "emulator" "platform-tools" "platforms;android-$API_LEVEL" "system-images;android-$API_LEVEL;google_apis;x86_64" || true
+          fi
+          
+          echo "Creating AVD..."
+          echo "no" | avdmanager create avd -n test_avd -k "system-images;android-$API_LEVEL;google_apis;x86_64" --device "Nexus 6" 2>/dev/null || true
+          
+          echo "Starting emulator..."
+          emulator -avd test_avd -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none &
+          EMULATOR_PID=$!
+          
+          echo "Waiting for emulator to boot..."
+          adb wait-for-device
+          sleep 10
+          
+          BOOT_COMPLETE=""
+          TIMEOUT=300
+          ELAPSED=0
+          while [ -z "$BOOT_COMPLETE" ] && [ $ELAPSED -lt $TIMEOUT ]; do
+            BOOT_COMPLETE=$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')
+            sleep 5
+            ELAPSED=$((ELAPSED + 5))
+          done
+          
+          if [ -z "$BOOT_COMPLETE" ]; then
+            echo "Emulator failed to boot"
+            exit 1
+          fi
+          
+          echo "Installing APK..."
+          adb install -r ${{ env.APK_PATH }}
+          
+          echo "Launching app..."
+          APP_ID="${{ steps.config.outputs.appId }}"
+          adb shell monkey -p $APP_ID -c android.intent.category.LAUNCHER 1
+          
+          sleep 30
+          echo "Taking screenshot 1..."
+          adb shell screencap -p /sdcard/screenshot1.png
+          adb pull /sdcard/screenshot1.png screenshots/screenshot_01.png
+          
+          sleep 30
+          echo "Taking screenshot 2..."
+          adb shell screencap -p /sdcard/screenshot2.png
+          adb pull /sdcard/screenshot2.png screenshots/screenshot_02.png
+          
+          sleep 30
+          echo "Taking screenshot 3..."
+          adb shell screencap -p /sdcard/screenshot3.png
+          adb pull /sdcard/screenshot3.png screenshots/screenshot_03.png
+          
+          adb shell reboot -p || true
+          kill $EMULATOR_PID 2>/dev/null || true
+
+      - name: Upload Screenshots Artifact
+        if: steps.config.outputs.runEmulator == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: Emulator-Screenshots
+          path: screenshots/
+          retention-days: 30
+          if-no-files-found: warn
