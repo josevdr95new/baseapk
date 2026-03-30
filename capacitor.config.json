@@ -18,6 +18,55 @@
       "backgroundColor": "#0a0e17",
       "navigationBarColor": "#0a0e17",
       "statusBarColor": "#0a0e17"
-    }
+    },
+    "Camera": {
+      "androidPermissions": [
+        "android.permission.CAMERA"
+      ]
+    },
+    "Geolocation": {
+      "androidPermissions": [
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION"
+      ]
+    },
+    "LocalNotifications": {
+      "smallIcon": "ic_stat_icon_config_sample",
+      "iconColor": "#488AFF",
+      "sound": "beep.wav"
+    },
+    "PushNotifications": {
+      "presentationOptions": ["badge", "sound", "alert"]
+    },
+    "SplashScreen": {
+      "launchShowDuration": 2000,
+      "launchAutoHide": true,
+      "backgroundColor": "#000000",
+      "androidSplashResourceName": "splash",
+      "androidScaleType": "CENTER_CROP"
+    },
+    "StatusBar": {
+      "style": "DARK",
+      "backgroundColor": "#0a0e17"
+    },
+    "Browser": {
+      "androidCustomTabsBackgroundColor": "#0a0e17"
+    },
+    "App": {
+      "launchUrl": ""
+    },
+    "ScreenOrientation": {
+      "lockOrientation": "portrait"
+    },
+    "Haptics": {},
+    "Network": {},
+    "Clipboard": {},
+    "Device": {},
+    "Dialogs": {},
+    "Filesystem": {},
+    "Preferences": {},
+    "TextZoom": {},
+    "Toast": {},
+    "Share": {}
   }
 }

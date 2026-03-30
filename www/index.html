@@ -1,253 +1,359 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#3F51B5">
+    <meta name="theme-color" content="#0f172a">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>HTML2APK Test App</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            color: white;
-        }
-
-        .container {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(10px);
-            border-radius: 24px;
-            padding: 40px;
-            text-align: center;
-            max-width: 400px;
-            width: 100%;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .logo {
-            width: 120px;
-            height: 120px;
-            background: white;
-            border-radius: 30px;
-            margin: 0 auto 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-        }
-
-        .logo svg {
-            width: 80px;
-            height: 80px;
-        }
-
-        h1 {
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 10px;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
-
-        .subtitle {
-            font-size: 16px;
-            opacity: 0.9;
-            margin-bottom: 30px;
-        }
-
-        .features {
-            text-align: left;
-            margin-bottom: 30px;
-        }
-
-        .feature {
-            display: flex;
-            align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .feature:last-child {
-            border-bottom: none;
-        }
-
-        .feature-icon {
-            width: 32px;
-            height: 32px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 12px;
-            font-size: 16px;
-        }
-
-        .feature-text {
-            flex: 1;
-            font-size: 14px;
-        }
-
-        .btn {
-            display: inline-block;
-            background: white;
-            color: #667eea;
-            padding: 14px 32px;
-            border-radius: 50px;
-            font-size: 16px;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            cursor: pointer;
-            border: none;
-            width: 100%;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        .btn:active {
-            transform: translateY(0);
-        }
-
-        .version {
-            margin-top: 20px;
-            font-size: 12px;
-            opacity: 0.7;
-        }
-
-        .counter {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 15px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-        }
-
-        .counter-value {
-            font-size: 48px;
-            font-weight: 700;
-            display: block;
-        }
-
-        .counter-label {
-            font-size: 14px;
-            opacity: 0.8;
-        }
-
-        .status {
-            padding: 10px;
-            border-radius: 8px;
-            margin-top: 20px;
-            font-size: 14px;
-        }
-
-        .status.success {
-            background: rgba(76, 175, 80, 0.3);
-        }
-
-        .status.info {
-            background: rgba(33, 150, 243, 0.3);
-        }
-
-        .webview-info {
-            margin-top: 20px;
-            padding: 15px;
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 12px;
-            font-size: 12px;
-            text-align: left;
-        }
-
-        .webview-info code {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-family: monospace;
-        }
-    </style>
+    <title>HTML2APK - Plugin Tester</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <div class="logo">
-            <svg viewBox="0 0 24 24" fill="#667eea">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
-            </svg>
+
+<div class="header">
+    <h1>HTML2APK Plugin Tester</h1>
+    <span class="version">20 Plugins Capacitor v8</span>
+    <div class="header-bar">
+        <span class="net-badge online" id="network-global-status">Verificando...</span>
+        <span class="plugin-count">20 plugins</span>
+    </div>
+</div>
+
+<div class="container">
+
+    <button class="btn-test-all" id="btn-test-all" onclick="testAllPlugins()">
+        Probar Todos los 20 Plugins
+    </button>
+
+    <div id="summary"></div>
+
+    <!-- 1. APP -->
+    <div class="plugin-card">
+        <div class="plugin-header">
+            <div class="plugin-icon" style="background:rgba(99,102,241,0.2);color:#818cf8;">&#9776;</div>
+            <div class="plugin-info">
+                <div class="plugin-name">1. App</div>
+                <div class="plugin-package">@capacitor/app</div>
+            </div>
         </div>
-
-        <h1>HTML2APK Test</h1>
-        <p class="subtitle">Web content running in Android WebView</p>
-
-        <div class="counter">
-            <span class="counter-value" id="counter">0</span>
-            <span class="counter-label">Button Clicks</span>
+        <div class="plugin-actions">
+            <button class="btn-test" onclick="testApp()">Probar</button>
+            <button class="btn-docs" onclick="openDocs('app')">&#128279; Docs</button>
         </div>
-
-        <button class="btn" id="incrementBtn">Click Me!</button>
-
-        <div class="status success" id="status">
-            WebView is working correctly!
-        </div>
-
-        <div class="webview-info">
-            <strong>WebView Information:</strong><br>
-            Platform: <code id="platform">-</code><br>
-            User Agent: <code id="userAgent">-</code><br>
-            Screen: <code id="screen">-</code>
-        </div>
-
-        <p class="version">HTML2APK v1.0.0</p>
+        <div class="result" id="result-app"></div>
     </div>
 
-    <script>
-        // Counter functionality
-        let count = 0;
-        const counterEl = document.getElementById('counter');
-        const incrementBtn = document.getElementById('incrementBtn');
+    <!-- 2. BROWSER -->
+    <div class="plugin-card">
+        <div class="plugin-header">
+            <div class="plugin-icon" style="background:rgba(59,130,246,0.2);color:#60a5fa;">&#127760;</div>
+            <div class="plugin-info">
+                <div class="plugin-name">2. Browser</div>
+                <div class="plugin-package">@capacitor/browser</div>
+            </div>
+        </div>
+        <div class="plugin-actions">
+            <button class="btn-test" onclick="testBrowser()">Probar</button>
+            <button class="btn-docs" onclick="openDocs('browser')">&#128279; Docs</button>
+        </div>
+        <div class="result" id="result-browser"></div>
+    </div>
 
-        incrementBtn.addEventListener('click', function() {
-            count++;
-            counterEl.textContent = count;
+    <!-- 3. CAMERA -->
+    <div class="plugin-card">
+        <div class="plugin-header">
+            <div class="plugin-icon" style="background:rgba(236,72,153,0.2);color:#f472b6;">&#128247;</div>
+            <div class="plugin-info">
+                <div class="plugin-name">3. Camera</div>
+                <div class="plugin-package">@capacitor/camera</div>
+            </div>
+        </div>
+        <div class="plugin-actions">
+            <button class="btn-test" onclick="testCamera()">Probar</button>
+            <button class="btn-docs" onclick="openDocs('camera')">&#128279; Docs</button>
+        </div>
+        <div class="result" id="result-camera"></div>
+    </div>
 
-            // Animate the counter
-            counterEl.style.transform = 'scale(1.2)';
-            setTimeout(() => {
-                counterEl.style.transform = 'scale(1)';
-            }, 100);
-        });
+    <!-- 4. CLIPBOARD -->
+    <div class="plugin-card">
+        <div class="plugin-header">
+            <div class="plugin-icon" style="background:rgba(168,85,247,0.2);color:#c084fc;">&#128203;</div>
+            <div class="plugin-info">
+                <div class="plugin-name">4. Clipboard</div>
+                <div class="plugin-package">@capacitor/clipboard</div>
+            </div>
+        </div>
+        <div class="plugin-actions">
+            <button class="btn-test" onclick="testClipboard()">Probar</button>
+            <button class="btn-docs" onclick="openDocs('clipboard')">&#128279; Docs</button>
+        </div>
+        <div class="result" id="result-clipboard"></div>
+    </div>
 
-        // Display WebView information
-        document.getElementById('platform').textContent = navigator.platform;
-        document.getElementById('userAgent').textContent = navigator.userAgent.substring(0, 50) + '...';
-        document.getElementById('screen').textContent = window.innerWidth + 'x' + window.innerHeight;
+    <!-- 5. DEVICE -->
+    <div class="plugin-card">
+        <div class="plugin-header">
+            <div class="plugin-icon" style="background:rgba(34,197,94,0.2);color:#4ade80;">&#128241;</div>
+            <div class="plugin-info">
+                <div class="plugin-name">5. Device</div>
+                <div class="plugin-package">@capacitor/device</div>
+            </div>
+        </div>
+        <div class="plugin-actions">
+            <button class="btn-test" onclick="testDevice()">Probar</button>
+            <button class="btn-docs" onclick="openDocs('device')">&#128279; Docs</button>
+        </div>
+        <div class="result" id="result-device"></div>
+    </div>
 
-        // Local storage persistence
-        if (localStorage.getItem('counter')) {
-            count = parseInt(localStorage.getItem('counter'));
-            counterEl.textContent = count;
-        }
+    <!-- 6. DIALOGS -->
+    <div class="plugin-card">
+        <div class="plugin-header">
+            <div class="plugin-icon" style="background:rgba(249,115,22,0.2);color:#fb923c;">&#128172;</div>
+            <div class="plugin-info">
+                <div class="plugin-name">6. Dialogs</div>
+                <div class="plugin-package">@capacitor/dialogs</div>
+            </div>
+        </div>
+        <div class="plugin-actions">
+            <button class="btn-test" onclick="testDialogs()">Probar</button>
+            <button class="btn-docs" onclick="openDocs('dialogs')">&#128279; Docs</button>
+        </div>
+        <div class="result" id="result-dialogs"></div>
+    </div>
 
-        incrementBtn.addEventListener('click', function() {
-            localStorage.setItem('counter', count);
-        });
+    <!-- 7. FILESYSTEM -->
+    <div class="plugin-card">
+        <div class="plugin-header">
+            <div class="plugin-icon" style="background:rgba(20,184,166,0.2);color:#2dd4bf;">&#128193;</div>
+            <div class="plugin-info">
+                <div class="plugin-name">7. Filesystem</div>
+                <div class="plugin-package">@capacitor/filesystem</div>
+            </div>
+        </div>
+        <div class="plugin-actions">
+            <button class="btn-test" onclick="testFilesystem()">Probar</button>
+            <button class="btn-docs" onclick="openDocs('filesystem')">&#128279; Docs</button>
+        </div>
+        <div class="result" id="result-filesystem"></div>
+    </div>
 
-        // Show success message
-        console.log('HTML2APK WebView Test - Loaded Successfully');
-    </script>
+    <!-- 8. GEOLOCATION -->
+    <div class="plugin-card">
+        <div class="plugin-header">
+            <div class="plugin-icon" style="background:rgba(239,68,68,0.2);color:#f87171;">&#128205;</div>
+            <div class="plugin-info">
+                <div class="plugin-name">8. Geolocation</div>
+                <div class="plugin-package">@capacitor/geolocation</div>
+            </div>
+        </div>
+        <div class="plugin-actions">
+            <button class="btn-test" onclick="testGeolocation()">Probar</button>
+            <button class="btn-docs" onclick="openDocs('geolocation')">&#128279; Docs</button>
+        </div>
+        <div class="result" id="result-geolocation"></div>
+    </div>
+
+    <!-- 9. HAPTICS -->
+    <div class="plugin-card">
+        <div class="plugin-header">
+            <div class="plugin-icon" style="background:rgba(236,72,153,0.2);color:#f472b6;">&#128168;</div>
+            <div class="plugin-info">
+                <div class="plugin-name">9. Haptics</div>
+                <div class="plugin-package">@capacitor/haptics</div>
+            </div>
+        </div>
+        <div class="plugin-actions">
+            <button class="btn-test" onclick="testHaptics()">Probar</button>
+            <button class="btn-docs" onclick="openDocs('haptics')">&#128279; Docs</button>
+        </div>
+        <div class="result" id="result-haptics"></div>
+    </div>
+
+    <!-- 10. KEYBOARD -->
+    <div class="plugin-card">
+        <div class="plugin-header">
+            <div class="plugin-icon" style="background:rgba(99,102,241,0.2);color:#a5b4fc;">&#9000;</div>
+            <div class="plugin-info">
+                <div class="plugin-name">10. Keyboard</div>
+                <div class="plugin-package">@capacitor/keyboard</div>
+            </div>
+        </div>
+        <div class="plugin-actions">
+            <button class="btn-test" onclick="testKeyboard()">Probar</button>
+            <button class="btn-docs" onclick="openDocs('keyboard')">&#128279; Docs</button>
+        </div>
+        <div class="result" id="result-keyboard"></div>
+    </div>
+
+    <!-- 11. LOCAL NOTIFICATIONS -->
+    <div class="plugin-card">
+        <div class="plugin-header">
+            <div class="plugin-icon" style="background:rgba(251,191,36,0.2);color:#fbbf24;">&#128276;</div>
+            <div class="plugin-info">
+                <div class="plugin-name">11. Local Notifications</div>
+                <div class="plugin-package">@capacitor/local-notifications</div>
+            </div>
+        </div>
+        <div class="plugin-actions">
+            <button class="btn-test" onclick="testLocalNotifications()">Probar</button>
+            <button class="btn-docs" onclick="openDocs('localNotifications')">&#128279; Docs</button>
+        </div>
+        <div class="result" id="result-local-notifications"></div>
+    </div>
+
+    <!-- 12. NETWORK -->
+    <div class="plugin-card">
+        <div class="plugin-header">
+            <div class="plugin-icon" style="background:rgba(34,197,94,0.2);color:#4ade80;">&#128268;</div>
+            <div class="plugin-info">
+                <div class="plugin-name">12. Network</div>
+                <div class="plugin-package">@capacitor/network</div>
+            </div>
+        </div>
+        <div class="plugin-actions">
+            <button class="btn-test" onclick="testNetwork()">Probar</button>
+            <button class="btn-docs" onclick="openDocs('network')">&#128279; Docs</button>
+        </div>
+        <div class="result" id="result-network"></div>
+    </div>
+
+    <!-- 13. PREFERENCES -->
+    <div class="plugin-card">
+        <div class="plugin-header">
+            <div class="plugin-icon" style="background:rgba(168,85,247,0.2);color:#c084fc;">&#128190;</div>
+            <div class="plugin-info">
+                <div class="plugin-name">13. Preferences</div>
+                <div class="plugin-package">@capacitor/preferences</div>
+            </div>
+        </div>
+        <div class="plugin-actions">
+            <button class="btn-test" onclick="testPreferences()">Probar</button>
+            <button class="btn-docs" onclick="openDocs('preferences')">&#128279; Docs</button>
+        </div>
+        <div class="result" id="result-preferences"></div>
+    </div>
+
+    <!-- 14. PUSH NOTIFICATIONS -->
+    <div class="plugin-card">
+        <div class="plugin-header">
+            <div class="plugin-icon" style="background:rgba(244,63,94,0.2);color:#fb7185;">&#128227;</div>
+            <div class="plugin-info">
+                <div class="plugin-name">14. Push Notifications</div>
+                <div class="plugin-package">@capacitor/push-notifications</div>
+            </div>
+        </div>
+        <div class="plugin-actions">
+            <button class="btn-test" onclick="testPushNotifications()">Probar</button>
+            <button class="btn-docs" onclick="openDocs('pushNotifications')">&#128279; Docs</button>
+        </div>
+        <div class="result" id="result-push-notifications"></div>
+    </div>
+
+    <!-- 15. SCREEN ORIENTATION -->
+    <div class="plugin-card">
+        <div class="plugin-header">
+            <div class="plugin-icon" style="background:rgba(56,189,248,0.2);color:#38bdf8;">&#128260;</div>
+            <div class="plugin-info">
+                <div class="plugin-name">15. Screen Orientation</div>
+                <div class="plugin-package">@capacitor/screen-orientation</div>
+            </div>
+        </div>
+        <div class="plugin-actions">
+            <button class="btn-test" onclick="testScreenOrientation()">Probar</button>
+            <button class="btn-docs" onclick="openDocs('screenOrientation')">&#128279; Docs</button>
+        </div>
+        <div class="result" id="result-screen-orientation"></div>
+    </div>
+
+    <!-- 16. SHARE -->
+    <div class="plugin-card">
+        <div class="plugin-header">
+            <div class="plugin-icon" style="background:rgba(34,197,94,0.2);color:#4ade80;">&#128228;</div>
+            <div class="plugin-info">
+                <div class="plugin-name">16. Share</div>
+                <div class="plugin-package">@capacitor/share</div>
+            </div>
+        </div>
+        <div class="plugin-actions">
+            <button class="btn-test" onclick="testShare()">Probar</button>
+            <button class="btn-docs" onclick="openDocs('share')">&#128279; Docs</button>
+        </div>
+        <div class="result" id="result-share"></div>
+    </div>
+
+    <!-- 17. SPLASH SCREEN -->
+    <div class="plugin-card">
+        <div class="plugin-header">
+            <div class="plugin-icon" style="background:rgba(251,146,60,0.2);color:#fb923c;">&#127918;</div>
+            <div class="plugin-info">
+                <div class="plugin-name">17. Splash Screen</div>
+                <div class="plugin-package">@capacitor/splash-screen</div>
+            </div>
+        </div>
+        <div class="plugin-actions">
+            <button class="btn-test" onclick="testSplashScreen()">Probar</button>
+            <button class="btn-docs" onclick="openDocs('splashScreen')">&#128279; Docs</button>
+        </div>
+        <div class="result" id="result-splash-screen"></div>
+    </div>
+
+    <!-- 18. STATUS BAR -->
+    <div class="plugin-card">
+        <div class="plugin-header">
+            <div class="plugin-icon" style="background:rgba(99,102,241,0.2);color:#818cf8;">&#9899;</div>
+            <div class="plugin-info">
+                <div class="plugin-name">18. Status Bar</div>
+                <div class="plugin-package">@capacitor/status-bar</div>
+            </div>
+        </div>
+        <div class="plugin-actions">
+            <button class="btn-test" onclick="testStatusBar()">Probar</button>
+            <button class="btn-docs" onclick="openDocs('statusBar')">&#128279; Docs</button>
+        </div>
+        <div class="result" id="result-status-bar"></div>
+    </div>
+
+    <!-- 19. TEXT ZOOM -->
+    <div class="plugin-card">
+        <div class="plugin-header">
+            <div class="plugin-icon" style="background:rgba(20,184,166,0.2);color:#2dd4bf;">&#128269;</div>
+            <div class="plugin-info">
+                <div class="plugin-name">19. Text Zoom</div>
+                <div class="plugin-package">@capacitor/text-zoom</div>
+            </div>
+        </div>
+        <div class="plugin-actions">
+            <button class="btn-test" onclick="testTextZoom()">Probar</button>
+            <button class="btn-docs" onclick="openDocs('textZoom')">&#128279; Docs</button>
+        </div>
+        <div class="result" id="result-text-zoom"></div>
+    </div>
+
+    <!-- 20. TOAST -->
+    <div class="plugin-card">
+        <div class="plugin-header">
+            <div class="plugin-icon" style="background:rgba(251,191,36,0.2);color:#fbbf24;">&#127839;</div>
+            <div class="plugin-info">
+                <div class="plugin-name">20. Toast</div>
+                <div class="plugin-package">@capacitor/toast</div>
+            </div>
+        </div>
+        <div class="plugin-actions">
+            <button class="btn-test" onclick="testToast()">Probar</button>
+            <button class="btn-docs" onclick="openDocs('toast')">&#128279; Docs</button>
+        </div>
+        <div class="result" id="result-toast"></div>
+    </div>
+
+</div>
+
+<div class="footer">
+    HTML2APK &bull; 20 Plugins Capacitor &bull; <a href="https://capacitorjs.com/docs">Documentacion Oficial</a>
+</div>
+
+<script src="plugins-test.js"></script>
 </body>
 </html>

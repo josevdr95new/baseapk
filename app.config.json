@@ -15,24 +15,23 @@
     "compileSdkVersion": 35,
     "permissions": [
       "android.permission.INTERNET",
-      "android.permission.ACCESS_NETWORK_STATE"
-    ],
-    "displayCutout": "shortEdges",
-    "iconBackgroundColor": "#000000",
-    "splashBackgroundColor": "#000000",
-    "hardwareAccelerated": true,
-    "largeHeap": true,
-    "allowBackup": false
-  },
-  "deepLinks": {
-    "enabled": false,
-    "scheme": "miapp",
-    "host": "miapp.com",
-    "paths": [
-      "/producto/:id",
-      "/usuario/:username",
-      "/configuracion",
-      "/promo/:codigo"
+      "android.permission.ACCESS_NETWORK_STATE",
+      "android.permission.CAMERA",
+      "android.permission.READ_MEDIA_IMAGES",
+      "android.permission.READ_EXTERNAL_STORAGE",
+      "android.permission.WRITE_EXTERNAL_STORAGE",
+      "android.permission.ACCESS_FINE_LOCATION",
+      "android.permission.ACCESS_COARSE_LOCATION",
+      "android.permission.POST_NOTIFICATIONS",
+      "android.permission.VIBRATE",
+      "android.permission.RECEIVE_BOOT_COMPLETED",
+      "android.permission.WAKE_LOCK",
+      "android.permission.FOREGROUND_SERVICE",
+      "android.permission.USE_FULL_SCREEN_INTENT",
+      "android.permission.SCHEDULE_EXACT_ALARM",
+      "android.permission.USE_BIOMETRIC",
+      "android.permission.READ_CONTACTS",
+      "android.permission.NFC"
     ]
   },
   "build": {

@@ -1,0 +1,254 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  background: #0f172a;
+  min-height: 100vh;
+  color: #e2e8f0;
+  padding-bottom: 80px;
+}
+
+.header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 24px 16px 20px;
+  text-align: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+.header h1 {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.header .version {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 500px;
+  margin: 12px auto 0;
+}
+
+.net-badge {
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-weight: 600;
+}
+
+.net-badge.online {
+  background: rgba(76, 175, 80, 0.3);
+  color: #81c784;
+  border: 1px solid rgba(76, 175, 80, 0.5);
+}
+
+.net-badge.offline {
+  background: rgba(244, 67, 54, 0.3);
+  color: #ef5350;
+  border: 1px solid rgba(244, 67, 54, 0.5);
+}
+
+.plugin-count {
+  font-size: 11px;
+  opacity: 0.8;
+  background: rgba(255,255,255,0.15);
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+.container {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.btn-test-all {
+  display: block;
+  width: 100%;
+  padding: 16px;
+  border: none;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  transition: all 0.2s;
+}
+
+.btn-test-all:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+}
+
+.btn-test-all:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+#summary {
+  text-align: center;
+  font-size: 13px;
+  color: #94a3b8;
+  margin-bottom: 16px;
+  min-height: 20px;
+}
+
+.plugin-card {
+  background: #1e293b;
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 12px;
+  border: 1px solid #334155;
+  transition: border-color 0.2s;
+}
+
+.plugin-card:hover {
+  border-color: #475569;
+}
+
+.plugin-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.plugin-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.plugin-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.plugin-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: #f1f5f9;
+}
+
+.plugin-package {
+  font-size: 11px;
+  color: #64748b;
+  font-family: monospace;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.plugin-actions {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.btn-test {
+  flex: 1;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 10px;
+  background: #334155;
+  color: #e2e8f0;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-test:hover {
+  background: #475569;
+}
+
+.btn-test:active {
+  transform: scale(0.97);
+}
+
+.btn-docs {
+  padding: 10px 14px;
+  border: none;
+  border-radius: 10px;
+  background: rgba(102, 126, 234, 0.15);
+  color: #818cf8;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.btn-docs:hover {
+  background: rgba(102, 126, 234, 0.25);
+}
+
+.result {
+  font-size: 12px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  line-height: 1.4;
+  min-height: 20px;
+  word-break: break-word;
+}
+
+.result.success {
+  background: rgba(76, 175, 80, 0.12);
+  color: #81c784;
+  border: 1px solid rgba(76, 175, 80, 0.2);
+}
+
+.result.error {
+  background: rgba(244, 67, 54, 0.12);
+  color: #ef5350;
+  border: 1px solid rgba(244, 67, 54, 0.2);
+}
+
+.result.warn {
+  background: rgba(255, 193, 7, 0.12);
+  color: #ffd54f;
+  border: 1px solid rgba(255, 193, 7, 0.2);
+}
+
+.result.info {
+  background: rgba(33, 150, 243, 0.12);
+  color: #64b5f6;
+  border: 1px solid rgba(33, 150, 243, 0.2);
+}
+
+.result:empty {
+  display: none;
+}
+
+.footer {
+  text-align: center;
+  padding: 24px 16px;
+  font-size: 11px;
+  color: #475569;
+}
+
+.footer a {
+  color: #818cf8;
+  text-decoration: none;
+}
