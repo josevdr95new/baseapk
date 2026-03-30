@@ -124,13 +124,15 @@ jobs:
           ls -la $ANDROID_HOME
 
       - name: Install Dependencies
-        run: npm install
+        run: |
+          npm install
+          npm install -g @capacitor/cli
 
       - name: Build Web App
         run: npm run build
 
       - name: Add Android Platform
-        run: npx cap add android
+        run: npx @capacitor/cli add android
 
       - name: Generate Icons and Splash Screens
         run: |
@@ -163,7 +165,7 @@ jobs:
       - name: Sync Capacitor
         run: |
           echo "=== Running cap sync ==="
-          npx cap sync android
+          npx @capacitor/cli sync android
           echo ""
           echo "=== Verificando Android plugins ==="
           cat android/app/src/main/assets/capacitor.config.json 2>/dev/null || echo "No capacitor.config.json in assets"
