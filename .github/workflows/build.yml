@@ -124,9 +124,7 @@ jobs:
           ls -la $ANDROID_HOME
 
       - name: Install Dependencies
-        run: |
-          npm install
-          npm install -g @capacitor/cli
+        run: npm install
 
       - name: Build Web App
         run: npm run build

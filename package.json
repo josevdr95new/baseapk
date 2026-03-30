@@ -6,7 +6,6 @@
   "main": "index.html",
   "scripts": {
     "build": "echo 'No build step required' && exit 0",
-
     "cap:init": "npx @capacitor/cli init 'html2apk' html2apk.josevdr95.html2apk --web-dir www",
     "cap:add": "npx @capacitor/cli add android",
     "cap:sync": "npx @capacitor/cli sync",
@@ -15,5 +14,41 @@
     "cap:build": "npx @capacitor/cli sync android",
     "android:build": "cd android && ./gradlew assembleDebug",
     "android:release": "cd android && ./gradlew assembleRelease"
+  },
+  "keywords": [
+    "capacitor",
+    "android",
+    "html2apk"
+  ],
+  "author": "html2apk",
+  "license": "MIT",
+  "dependencies": {
+    "@capacitor/android": "^8.0.0",
+    "@capacitor/app": "^8.0.0",
+    "@capacitor/browser": "^8.0.0",
+    "@capacitor/camera": "^8.0.0",
+    "@capacitor/clipboard": "^8.0.0",
+    "@capacitor/core": "^8.0.0",
+    "@capacitor/device": "^8.0.0",
+    "@capacitor/dialog": "^8.0.0",
+    "@capacitor/filesystem": "^8.0.0",
+    "@capacitor/geolocation": "^8.0.0",
+    "@capacitor/haptics": "^8.0.0",
+    "@capacitor/keyboard": "^8.0.0",
+    "@capacitor/local-notifications": "^8.0.0",
+    "@capacitor/network": "^8.0.0",
+    "@capacitor/preferences": "^8.0.0",
+    "@capacitor/push-notifications": "^8.0.0",
+    "@capacitor/screen-orientation": "^8.0.0",
+    "@capacitor/share": "^8.0.0",
+    "@capacitor/splash-screen": "^8.0.0",
+    "@capacitor/status-bar": "^8.0.0",
+    "@capacitor/text-zoom": "^8.0.0",
+    "@capacitor/toast": "^8.0.0",
+    "@capawesome/capacitor-android-edge-to-edge-support": "^8.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^8.0.0"
   }
 }
