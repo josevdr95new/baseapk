@@ -62,7 +62,7 @@
     "Network": {},
     "Clipboard": {},
     "Device": {},
-    "Dialogs": {},
+    "Dialog": {},
     "Filesystem": {},
     "Preferences": {},
     "TextZoom": {},

@@ -289,13 +289,13 @@ Muestra dialogos nativos de Android (alert, confirm, prompt, acciones).
 
 ```javascript
 // Alert
-await window.Capacitor.Plugins.Dialogs.alert({
+await window.Capacitor.Plugins.Dialog.alert({
   title: "Titulo",
   message: "Mensaje del alert"
 });
 
 // Confirm
-const result = await window.Capacitor.Plugins.Dialogs.confirm({
+const result = await window.Capacitor.Plugins.Dialog.confirm({
   title: "Confirmar",
   message: "Estas seguro?",
   okButtonTitle: "Si",
@@ -304,7 +304,7 @@ const result = await window.Capacitor.Plugins.Dialogs.confirm({
 console.log(result.value);  // true = Si, false = No
 
 // Prompt (input)
-const result = await window.Capacitor.Plugins.Dialogs.prompt({
+const result = await window.Capacitor.Plugins.Dialog.prompt({
   title: "Ingresar",
   message: "Escribe tu nombre:",
   okButtonTitle: "Aceptar",
@@ -316,7 +316,7 @@ console.log(result.cancelled);  // true/false
 console.log(result.value);      // texto ingresado
 
 // Sheet de acciones
-const result = await window.Capacitor.Plugins.Dialogs.showActions({
+const result = await window.Capacitor.Plugins.Dialog.showActions({
   title: "Seleccionar opcion",
   message: "Elige una accion:",
   options: [

@@ -149,17 +149,17 @@ async function testDevice() {
 async function testDialogs() {
   updateResult("dialogs", "info", "Probando...");
   try {
-    await window.Capacitor.Plugins.Dialogs.alert({
+    await window.Capacitor.Plugins.Dialog.alert({
       title: "HTML2APK",
       message: "Este es un dialogo nativo de prueba!"
     });
-    const confirm = await window.Capacitor.Plugins.Dialogs.confirm({
+    const confirm = await window.Capacitor.Plugins.Dialog.confirm({
       title: "Confirmacion",
       message: "Esto es una confirmacion nativa",
       okButtonTitle: "Si",
       cancelButtonTitle: "No"
     });
-    const prompt = await window.Capacitor.Plugins.Dialogs.prompt({
+    const prompt = await window.Capacitor.Plugins.Dialog.prompt({
       title: "Prompt",
       message: "Escribe algo:",
       okButtonTitle: "OK",
