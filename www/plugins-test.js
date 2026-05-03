@@ -1,5 +1,5 @@
 // ============================================================
-// HTML2APK - Plugin Test Suite (20 Plugins Capacitor)
+// HTML2APK - Plugin Test Suite (20 Plugins Capacitor.)
 // ============================================================
 
 const PLUGINS_CONFIG = {
